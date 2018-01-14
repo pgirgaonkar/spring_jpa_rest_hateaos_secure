@@ -1,4 +1,4 @@
-group 'spring_jpa_rest'
+group 'spring_jpa_rest_hateos'
 version '1.0-SNAPSHOT'
 
 buildscript {
