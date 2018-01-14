@@ -1,6 +1,9 @@
 .gradle
 /build/
 spring*.i*
+*.iws
+*.ipr
+*.iml
 
 # Ignore Gradle GUI config
 gradle-app.setting
