@@ -20,7 +20,7 @@ public class Application {
     @Bean
     CommandLineRunner init(AccountRepository accountRepository, BookmarkRepository bookmarkRepository){
         return (clr) -> {
-            Arrays.asList("Prafulla, Ameya,Shirish, Shreyas, Avadhut, Sachin, Sameer".split(","))
+            Arrays.asList("Prafulla,Ameya,Shirish,Shreyas,Avadhut,Sachin,Sameer".split(","))
                     .forEach( user -> {
                         Account a = accountRepository.save(new Account(user, user+"_paswd"));
 

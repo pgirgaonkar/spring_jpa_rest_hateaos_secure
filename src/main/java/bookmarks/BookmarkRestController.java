@@ -1,12 +1,15 @@
 package bookmarks;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/{userId}/bookmarks")
@@ -22,9 +25,10 @@ public class BookmarkRestController {
     }
 
     @RequestMapping(method= RequestMethod.GET)
-    public Collection<Bookmark> readBookmarks(@PathVariable String userId){
+    public Collection<BookmarkResource> readBookmarks(@PathVariable String userId){
         this.validateUser(userId);
-        Collection<Bookmark> x = this.bookmarkRepository.findByAccountUsername(userId);
+        Collection<BookmarkResource> x = this.bookmarkRepository.findByAccountUsername(userId).stream().map(BookmarkResource::new).collect(Collectors.toList());
+        //return new Collection<BookmarkResource>(x);
         return x;
     }
 
@@ -39,20 +43,21 @@ public class BookmarkRestController {
                     Bookmark result = bookmarkRepository.save(new Bookmark(account,
                             input.getUri(), input.getDescription()));
 
-                    URI location = ServletUriComponentsBuilder
-                            .fromCurrentRequest().path("/{id}")
-                            .buildAndExpand(result.getId()).toUri();
+//                    URI location = ServletUriComponentsBuilder
+//                            .fromCurrentRequest().path("/{id}")
+//                            .buildAndExpand(result.getId()).toUri();
 
-                    return ResponseEntity.created(location).build();
+                    Link forOneBookmark = new BookmarkResource(result).getLink("self");
+                    return ResponseEntity.created(URI.create(forOneBookmark.getHref())).build();
                 })
                 .orElse(ResponseEntity.noContent().build());
 
     }
 
     @RequestMapping(method = RequestMethod.GET, value="/{bookmarkId}")
-    Bookmark readBookmark(@PathVariable String userId , @PathVariable Long bookmarkId) {
+    BookmarkResource readBookmark(@PathVariable String userId , @PathVariable Long bookmarkId) {
         this.validateUser(userId);
-        return bookmarkRepository.findOne(bookmarkId);
+        return new BookmarkResource(bookmarkRepository.findOne(bookmarkId));
     }
 
 
