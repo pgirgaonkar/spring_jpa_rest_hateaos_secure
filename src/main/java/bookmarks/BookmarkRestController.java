@@ -12,7 +12,8 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/{userId}/bookmarks")
+//@RequestMapping("/{userId}/bookmarks")
+@RequestMapping("/bookmarks")
 public class BookmarkRestController {
 
     private final AccountRepository accountRepository;
