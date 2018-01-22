@@ -2,12 +2,11 @@ package bookmarks;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -26,20 +25,20 @@ public class BookmarkRestController {
     }
 
     @RequestMapping(method= RequestMethod.GET)
-    public Collection<BookmarkResource> readBookmarks(@PathVariable String userId){
-        this.validateUser(userId);
-        Collection<BookmarkResource> x = this.bookmarkRepository.findByAccountUsername(userId).stream().map(BookmarkResource::new).collect(Collectors.toList());
+    public Collection<BookmarkResource> readBookmarks(Principal principal){
+        this.validateUser(principal);
+        Collection<BookmarkResource> x = this.bookmarkRepository.findByAccountUsername(principal.getName()).stream().map(BookmarkResource::new).collect(Collectors.toList());
         //return new Collection<BookmarkResource>(x);
         return x;
     }
 
     //TODO - STUDY
     @RequestMapping(method = RequestMethod.POST)
-    ResponseEntity<?> add(@PathVariable String userId, @RequestBody Bookmark input) {
-        this.validateUser(userId);
+    ResponseEntity<?> add(Principal principal, @RequestBody Bookmark input) {
+        this.validateUser(principal);
 
         return this.accountRepository
-                .findByUsername(userId)
+                .findByUsername(principal.getName())
                 .map(account -> {
                     Bookmark result = bookmarkRepository.save(new Bookmark(account,
                             input.getUri(), input.getDescription()));
@@ -56,13 +55,14 @@ public class BookmarkRestController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value="/{bookmarkId}")
-    BookmarkResource readBookmark(@PathVariable String userId , @PathVariable Long bookmarkId) {
-        this.validateUser(userId);
+    BookmarkResource readBookmark(Principal principal , @PathVariable Long bookmarkId) {
+        this.validateUser(principal);
         return new BookmarkResource(bookmarkRepository.findOne(bookmarkId));
     }
 
 
-    private void validateUser(String userId){
+    private void validateUser(Principal principal){
+        String userId = principal.getName();
         this.accountRepository.findByUsername(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 }

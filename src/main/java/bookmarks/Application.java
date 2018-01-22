@@ -33,9 +33,10 @@ public class Application {
     @Bean
     CommandLineRunner init(AccountRepository accountRepository, BookmarkRepository bookmarkRepository){
         return (clr) -> {
-            Arrays.asList("Prafulla,Ameya,Shirish,Shreyas,Avadhut,Sachin,Sameer".split(","))
+            Arrays.asList("Raghav,Abhiram,Sharad,Pravin".split(","))
                     .forEach( user -> {
-                        Account a = accountRepository.save(new Account(user, user+"_paswd"));
+                        Account a;
+                        a = accountRepository.save(new Account(user, user+"_paswd"));
 
                         bookmarkRepository.save(new Bookmark(a, "HttPs://"+user+"_1.mylogin.ner/"+rnd.nextInt(50)+1, " this is a sample first"));
                         bookmarkRepository.save(new Bookmark(a, "HttPs://"+user+"_2.mylogin.ner/"+rnd.nextInt(50)+1, " this is a sample Second"));
